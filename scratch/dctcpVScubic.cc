@@ -172,13 +172,13 @@ int main (int argc, char *argv[])
   uint32_t initialCwnd = 10;
   uint32_t PACKET_SIZE = 1400;
   double start_time = 0;
-  double stop_time = 0.5;
+  double stop_time = 2;
   //bool front_model = true;
 
   bool tracing = true;
   bool printRedStats = false;
   bool printFifoStats = false;
-  bool pcap = true;
+  bool pcap = false;
 
   // Create directory information
   time_t rawtime;
