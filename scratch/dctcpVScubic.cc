@@ -156,19 +156,19 @@ int main (int argc, char *argv[])
 {
   // Configure information
   std::string prefix_file_name = "dctcp-vs-cubic";
-  uint32_t sendNum = 5;
+  uint32_t sendNum = 40;
   std::string transport_port = "TcpCubic";
   std::string queue_disc_type = "RedQueueDisc";
-  std::string queue_limit = "140p";
+  std::string queue_limit = "180p";//140p, 200p
   double K = 20;
-  double MinTh = 5;
-  double MaxTh = 15;
-  std::string bandwidth = "1000Mbps";
-  std::string delay = "0.2ms";
+  double MinTh = 10;
+  double MaxTh = 30;
+  std::string bandwidth = "1000Mbps";//1Gbps,10Gbps
+  std::string delay = "0.01ms";//0.2ms, 0.02ms
   std::string bottleneck_bw = "1000Mbps";
-  std::string bottleneck_delay = "0.2ms";
+  std::string bottleneck_delay = "0.01ms";
   uint64_t data_mbytes = 0;
-  double minRto = 0.005;
+  double minRto = 0.0005;//500 microsecond
   uint32_t initialCwnd = 10;
   uint32_t PACKET_SIZE = 1400;
   double start_time = 0;
@@ -178,7 +178,7 @@ int main (int argc, char *argv[])
   bool tracing = true;
   bool printRedStats = false;
   bool printFifoStats = false;
-  bool pcap = false;
+  bool pcap = true;
 
   // Create directory information
   time_t rawtime;
@@ -219,35 +219,33 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (PACKET_SIZE));
   Config::SetDefault ("ns3::TcpSocket::InitialCwnd", UintegerValue (initialCwnd));
   Config::SetDefault ("ns3::TcpSocketBase::MinRto", TimeValue (Seconds (minRto)));
+  Config::SetDefault ("ns3::TcpSocketBase::ClockGranularity", TimeValue (MicroSeconds (100)));
+  Config::SetDefault ("ns3::RttEstimator::InitialEstimation", TimeValue (MicroSeconds (40)));
   Config::SetDefault ("ns3::TcpSocketBase::Sack", BooleanValue (true));
   Config::SetDefault("ns3::TcpSocketState::EnablePacing", BooleanValue (true));
+  Config::SetDefault("ns3::TcpSocketBase::EcnMode", EnumValue(1));
+  Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
+  Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
+  Config::SetDefault("ns3::RedQueueDisc::MeanPktSize", UintegerValue (PACKET_SIZE));
 
   if(transport_port.compare("TcpDctcp") == 0)
   {
 	  NS_LOG_INFO ("Configure TcpDctcp And Red");
 	  printRedStats = true;
 	  Config::SetDefault("ns3::TcpL4Protocol::SocketType", TypeIdValue (TcpDctcp::GetTypeId()));
-	  Config::SetDefault("ns3::TcpSocketBase::EcnMode", EnumValue(1));
-	  Config::SetDefault("ns3::RedQueueDisc::MeanPktSize", UintegerValue (PACKET_SIZE));
 	  Config::SetDefault("ns3::RedQueueDisc::QW", DoubleValue (1));
 	  Config::SetDefault("ns3::RedQueueDisc::MinTh", DoubleValue (K));
 	  Config::SetDefault("ns3::RedQueueDisc::MaxTh", DoubleValue (K));
-	  Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
-	  Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
-	  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (true));
-	  Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (true));
+	  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
+	  Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
   }
   else if(transport_port.compare("TcpCubic") == 0)
   {
 	  NS_LOG_INFO ("Configure TcpCubic And Red");
 	  printRedStats = true;
 	  Config::SetDefault("ns3::TcpL4Protocol::SocketType", TypeIdValue (TcpCubic::GetTypeId()));
-	  Config::SetDefault("ns3::TcpSocketBase::EcnMode", EnumValue(1));
-	  Config::SetDefault("ns3::RedQueueDisc::MeanPktSize", UintegerValue (PACKET_SIZE));
 	  Config::SetDefault("ns3::RedQueueDisc::MinTh", DoubleValue (MinTh));
 	  Config::SetDefault("ns3::RedQueueDisc::MaxTh", DoubleValue (MaxTh));
-	  Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
-	  Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
   }
 
 
