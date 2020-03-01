@@ -159,12 +159,12 @@ int main (int argc, char *argv[])
   uint32_t sendNum = 40;
   std::string transport_port = "TcpCubic";
   std::string queue_disc_type = "RedQueueDisc";
-  std::string queue_limit = "180p";//140p, 200p
+  std::string queue_limit = "180p";
   double K = 20;
   double MinTh = 10;
   double MaxTh = 30;
-  std::string bandwidth = "1000Mbps";//1Gbps,10Gbps
-  std::string delay = "0.01ms";//0.2ms, 0.02ms
+  std::string bandwidth = "1000Mbps";//1Gbps
+  std::string delay = "0.01ms";
   std::string bottleneck_bw = "1000Mbps";
   std::string bottleneck_delay = "0.01ms";
   uint64_t data_mbytes = 0;
@@ -173,7 +173,6 @@ int main (int argc, char *argv[])
   uint32_t PACKET_SIZE = 1400;
   double start_time = 0;
   double stop_time = 2;
-  //bool front_model = true;
 
   bool tracing = true;
   bool printRedStats = false;
