@@ -234,8 +234,8 @@ int main (int argc, char *argv[])
 	  Config::SetDefault("ns3::RedQueueDisc::MaxTh", DoubleValue (K));
 	  Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
 	  Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
-	  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
-	  Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
+	  //Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
+	  //Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
   }
   else if(transport_port.compare("TcpCubic") == 0)
   {
