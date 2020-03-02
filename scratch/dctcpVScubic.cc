@@ -27,7 +27,7 @@ static Ptr<OutputStreamWrapper> rttStream;
 static Ptr<OutputStreamWrapper> rtoStream;
 static uint32_t cWndValue;
 static uint32_t ssThreshValue;
-static double interval = 0.004;
+static double interval = 0.0004;
 uint64_t flowRecvBytes = 0;
 
 static void
@@ -144,35 +144,28 @@ ThroughputPerSecond(Ptr<PacketSink> sink1Apps,std::string filePlotThrough)
 	std::ofstream fPlotThroughput (filePlotThrough.c_str (), std::ios::out | std::ios::app);
 	fPlotThroughput << Simulator::Now().GetSeconds() << " " << currentPeriodRecvBytes * 8 / (interval * 1000000) << std::endl;
 }
-//void
-//PrintPayload(Ptr<const Packet> p)
-//{
-//	std::ofstream fPlotQueue("throught.dat",std::ios::out | std::ios::app);
-//	fPlotQueue << Simulator::Now().GetSeconds()<< " " << p->GetSize() << std::endl;
-//	fPlotQueue.close();
-//}
 
 int main (int argc, char *argv[])
 {
   // Configure information
   std::string prefix_file_name = "dctcp-vs-cubic";
-  uint32_t sendNum = 40;
+  uint32_t sendNum = 5;
   std::string transport_port = "TcpCubic";
   std::string queue_disc_type = "RedQueueDisc";
-  std::string queue_limit = "180p";
-  double K = 20;
-  double MinTh = 10;
-  double MaxTh = 30;
-  std::string bandwidth = "1000Mbps";//1Gbps
-  std::string delay = "0.01ms";
-  std::string bottleneck_bw = "1000Mbps";
-  std::string bottleneck_delay = "0.01ms";
+  std::string queue_limit = "4195p";//almost 4MB buffer
+  double K = 20;// 20 for 1Gbps, 65 for 10Gbps
+  double MinTh = 20;//MinTh=120  for 10Gbps, MinTh=20 for 1Gbps can get the similar throughput with DCTCP
+  double MaxTh = 60;//MaxTh=3*MinTh is suggested
+  std::string bandwidth = "1000Mbps";//1Gbps,10Gbps
+  std::string delay = "0.02ms";
+  std::string bottleneck_bw = "1000Mbps";//1Gbps,10Gbps
+  std::string bottleneck_delay = "0.02ms";
   uint64_t data_mbytes = 0;
-  double minRto = 0.0005;//500 microsecond
-  uint32_t initialCwnd = 10;
-  uint32_t PACKET_SIZE = 1400;
+  double minRto = 0.005;//5ms
+  uint32_t initialCwnd = 1;
+  uint32_t PACKET_SIZE = 1000;
   double start_time = 0;
-  double stop_time = 2;
+  double stop_time = 1;
 
   bool tracing = true;
   bool printRedStats = false;
@@ -226,6 +219,11 @@ int main (int argc, char *argv[])
   Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
   Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
   Config::SetDefault("ns3::RedQueueDisc::MeanPktSize", UintegerValue (PACKET_SIZE));
+  Config::SetDefault("ns3::RedQueueDisc::LinkBandwidth", DataRateValue (DataRate ("1000Mbps")));
+  Config::SetDefault("ns3::RedQueueDisc::LinkDelay", TimeValue (MilliSeconds (0.02)));
+  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
+  Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
+
 
   if(transport_port.compare("TcpDctcp") == 0)
   {
@@ -235,8 +233,6 @@ int main (int argc, char *argv[])
 	  Config::SetDefault("ns3::RedQueueDisc::QW", DoubleValue (1));
 	  Config::SetDefault("ns3::RedQueueDisc::MinTh", DoubleValue (K));
 	  Config::SetDefault("ns3::RedQueueDisc::MaxTh", DoubleValue (K));
-	  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
-	  Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
   }
   else if(transport_port.compare("TcpCubic") == 0)
   {
@@ -334,7 +330,7 @@ int main (int argc, char *argv[])
 	  ftp.SetAttribute("MaxBytes", UintegerValue(data_mbytes*0));
 	  ApplicationContainer sourceApp = ftp.Install(senders.Get(i));
 	  sourceApp.Start(Seconds(start_time));
-	  sourceApp.Stop(Seconds(stop_time - 0.2));
+	  sourceApp.Stop(Seconds(stop_time - 0.02));
   }
 
   PacketSinkHelper sinkHelper("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny(), port));
