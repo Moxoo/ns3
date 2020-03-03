@@ -210,7 +210,7 @@ int main (int argc, char *argv[])
   // Configure information
   std::string prefix_file_name = "dctcp-vs-cubic";
   uint32_t sendNum = 5;
-  std::string transport_port = "TcpCubic";
+  std::string transport_port = "TcpDctcp";//  Or "TcpCubic"
   std::string queue_disc_type = "RedQueueDisc";
   std::string queue_limit = "4195p";//almost 4MB buffer
   double K = 20;// 20 for 1Gbps, 65 for 10Gbps
@@ -271,17 +271,11 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (PACKET_SIZE));
   Config::SetDefault ("ns3::TcpSocket::InitialCwnd", UintegerValue (initialCwnd));
   Config::SetDefault ("ns3::TcpSocketBase::MinRto", TimeValue (Seconds (minRto)));
-  //Config::SetDefault ("ns3::TcpSocketBase::ClockGranularity", TimeValue (MicroSeconds (100)));
-  //Config::SetDefault ("ns3::RttEstimator::InitialEstimation", TimeValue (MicroSeconds (40)));
   Config::SetDefault ("ns3::TcpSocketBase::Sack", BooleanValue (true));
-  //Config::SetDefault("ns3::TcpSocketState::EnablePacing", BooleanValue (true));
   Config::SetDefault("ns3::TcpSocketBase::EcnMode", EnumValue(1));
   Config::SetDefault("ns3::RedQueueDisc::UseEcn", BooleanValue (true));
   Config::SetDefault("ns3::RedQueueDisc::MaxSize", QueueSizeValue (QueueSize (queue_limit)));
   Config::SetDefault("ns3::RedQueueDisc::MeanPktSize", UintegerValue (PACKET_SIZE));
-  //Config::SetDefault("ns3::RedQueueDisc::LinkBandwidth", DataRateValue (DataRate ("1000Mbps")));
-  //Config::SetDefault("ns3::RedQueueDisc::LinkDelay", TimeValue (MilliSeconds (0.02)));
-  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
   Config::SetDefault("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
 
 
@@ -293,6 +287,7 @@ int main (int argc, char *argv[])
 	  Config::SetDefault("ns3::RedQueueDisc::QW", DoubleValue (1));
 	  Config::SetDefault("ns3::RedQueueDisc::MinTh", DoubleValue (K));
 	  Config::SetDefault("ns3::RedQueueDisc::MaxTh", DoubleValue (K));
+	  Config::SetDefault("ns3::RedQueueDisc::Gentle", BooleanValue (false));
   }
   else if(transport_port.compare("TcpCubic") == 0)
   {
