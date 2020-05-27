@@ -337,6 +337,7 @@ RedQueueFrontDisc::AssignStreams (int64_t stream)
   return 1;
 }
 
+//******Xu Ma's (mushu@njust.edu.cn) implementation starts******//
 // Just do enqueue
 bool
 RedQueueFrontDisc::DoEnqueue (Ptr<QueueDiscItem> item)
@@ -360,7 +361,8 @@ RedQueueFrontDisc::DoEnqueue (Ptr<QueueDiscItem> item)
 
   return retval;
 }
-
+//******Xu Ma's (mushu@njust.edu.cn) implementation ends******//
+	
 /*
  * Note: if the link bandwidth changes in the course of the
  * simulation, the bandwidth-dependent RED parameters do not change.
@@ -725,6 +727,7 @@ RedQueueFrontDisc::ModifyP (double p, uint32_t size)
   return p;
 }
 
+//******Xu Ma's (mushu@njust.edu.cn) implementation starts******//
 Ptr<QueueDiscItem>
 RedQueueFrontDisc::DoDequeue (void)
 {
@@ -840,6 +843,7 @@ RedQueueFrontDisc::DoDequeue (void)
       return item;
     }
 }
+//******Xu Ma's (mushu@njust.edu.cn) implementation ends******//
 
 Ptr<const QueueDiscItem>
 RedQueueFrontDisc::DoPeek (void)
